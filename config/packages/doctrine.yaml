@@ -1,0 +1,6 @@
+doctrine:
+    dbal:
+        default_connection: blog
+        connections:
+            blog:
+                url: "%env(resolve:BLOG_DATABASE_URL)%"

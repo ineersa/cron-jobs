@@ -39,3 +39,11 @@ All CRON jobs are implemented as Symfony Console Commands. To create a new job:
     - Commands: Suffix with `Command` (e.g., `BackupDatabaseCommand`).
     - Services: Name them based on their responsibility (e.g., `GoogleDriveUploader`, `DatabaseBackupManager`).
 - **Configuration:** All environment-specific configuration, especially secrets and database URLs, should be managed in `.env.local` or other environment-specific `.env` files. Do not commit these files to version control.
+
+## Env files and secrets
+*VERY IMPORTANT* You are not allowed to modify `.env.local` env files, can only read them.
+Use secrets vault to store secrets.
+If secret added, add dummy value to .env, add secret for both dev and prod environments, for example for prod env: 
+```bash
+APP_RUNTIME_ENV=prod php bin/console secrets:set APP_SECRET
+```

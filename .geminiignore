@@ -8,4 +8,5 @@
 /vendor/
 ###< symfony/framework-bundle ###
 /.idea
+server-things-1751561081714-a924313a5574.json
 google_service_account.json

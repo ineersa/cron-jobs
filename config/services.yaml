@@ -18,3 +18,14 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    App\Service\GoogleDriveService:
+        arguments:
+            $serviceAccountJsonPath: '%env(GOOGLE_SERVICE_ACCOUNT_JSON_PATH)%'
+
+
+    App\Command\BackupStorageCommand:
+        arguments:
+            $localStorageFolder: "%env(LOCAL_STORAGE_FOLDER)%"
+            $driveStoragePath: "%env(DRIVE_STORAGE_PATH)%"
+

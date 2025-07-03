@@ -34,28 +34,34 @@ class BackupStorageCommand extends Command
         $io->title('Starting storage backup process...');
 
         // Create archive
-        $backupFileName = 'backup-' . date('Y-m-d-H-i-s') . '.tar.gz';
-        $backupFilePath = '/tmp/' . $backupFileName;
+        $backupFileName = 'storage_' . date('Y_m_d_H') . '.tar.gz';
+        $backupFilePath = './data/' . $backupFileName;
         $command = "tar -czvf {$backupFilePath} -C {$this->localStorageFolder} .";
         shell_exec($command);
 
         $io->info("Created backup archive: {$backupFileName}");
 
         // Upload to Google Drive
-        $folderId = $this->googleDriveService->getFolderId($this->driveStoragePath);
-        if (!$folderId) {
-            $io->error("Google Drive folder '{$this->driveStoragePath}' not found.");
-            return Command::FAILURE;
-        }
+        $io->info("Ensuring Google Drive folder '{$this->driveStoragePath}' exists...");
+        $folderId = $this->googleDriveService->findOrCreatePath($this->driveStoragePath);
+        $io->info("Google Drive folder ID: {$folderId}");
 
+        $io->info("Uploading backup to Google Drive...");
         $this->googleDriveService->uploadFile($backupFilePath, $folderId);
         $io->info("Uploaded backup to Google Drive.");
 
         // Clean up local archive
         unlink($backupFilePath);
 
-        // Clean up old backups
+        // Verify file exists and clean up old backups
+        $io->info("Verifying files in Google Drive folder...");
         $files = $this->googleDriveService->listFiles($folderId);
+        $io->info("Found " . count($files) . " files in the backup folder.");
+
+        foreach ($files as $file) {
+            $io->info("  - {$file->getName()} (ID: {$file->getId()})");
+        }
+
         if (count($files) > 5) {
             usort($files, fn($a, $b) => strtotime($a->getCreatedTime()) - strtotime($b->getCreatedTime()));
             $filesToDelete = array_slice($files, 0, count($files) - 5);

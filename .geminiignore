@@ -3,10 +3,7 @@
 /.env.local.php
 /.env.*.local
 /config/secrets/prod/prod.decrypt.private.php
-/public/bundles/
-/var/
-/vendor/
 ###< symfony/framework-bundle ###
 /.idea
-server-things-1751561081714-a924313a5574.json
 google_service_account.json
+.cache_ggshield

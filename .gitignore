@@ -9,3 +9,4 @@
 ###< symfony/framework-bundle ###
 /.idea
 google_service_account.json
+.cache_ggshield

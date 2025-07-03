@@ -1,0 +1,24 @@
+{
+    "theme": "Default",
+    "selectedAuthType": "gemini-api-key",
+    "mcpServers": {
+        "mcp_server_mysql": {
+            "command": "/home/ineersa/.nvm/versions/node/v22.17.0/bin/node",
+            "args": [
+                "/home/ineersa/.nvm/versions/node/v22.17.0/lib/node_modules/@benborla29/mcp-server-mysql/dist/index.js"
+            ],
+            "env": {
+                "MYSQL_HOST": "127.0.0.1",
+                "MYSQL_PORT": "3306",
+                "MYSQL_USER": "mcp_user",
+                "MYSQL_PASS": "mcp_password",
+                "MYSQL_DB": "blog",
+                "ALLOW_INSERT_OPERATION": "false",
+                "ALLOW_UPDATE_OPERATION": "false",
+                "ALLOW_DELETE_OPERATION": "false",
+                "PATH": "/home/ineersa/.nvm/versions/node/v22.17.0/bin/node/bin:/usr/bin:/bin",
+                "NODE_PATH": "/home/ineersa/.nvm/versions/node/v22.17.0/bin/node/lib/node_modules"
+            }
+        }
+    }
+}

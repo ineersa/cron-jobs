@@ -24,19 +24,18 @@ class GoogleDriveService
         $this->driveService = new Google_Service_Drive($client);
     }
 
-    public function uploadFile(string $filePath, string $folderId): string
+    public function uploadFile(string $filePath, string $folderId): Google_Service_Drive_DriveFile
     {
         $file = new Google_Service_Drive_DriveFile();
         $file->setName(basename($filePath));
         $file->setParents([$folderId]);
 
-        $fileId = $this->driveService->files->create($file, [
+        return $this->driveService->files->create($file, [
             'data' => file_get_contents($filePath),
             'mimeType' => 'application/octet-stream',
             'uploadType' => 'multipart',
+            'fields' => 'id,webViewLink',
         ]);
-
-        return $fileId->id;
     }
 
     public function listFiles(string $folderId): array

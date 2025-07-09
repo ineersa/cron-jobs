@@ -31,3 +31,8 @@ services:
             $localStorageFolder: "%env(LOCAL_STORAGE_FOLDER)%"
             $driveStoragePath: "%env(DRIVE_STORAGE_PATH)%"
 
+    App\Service\EmailService:
+        arguments:
+            $from: '%env(MAILER_FROM)%'
+            $to: '%env(MAILER_TO)%'
+

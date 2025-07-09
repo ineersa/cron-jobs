@@ -2,9 +2,11 @@
 
 namespace App\Command;
 
+use App\Service\EmailService;
 use App\Service\GoogleDriveService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -15,22 +17,18 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class BackupStorageCommand extends Command
 {
-    private GoogleDriveService $googleDriveService;
-    private string $localStorageFolder;
-    private string $driveStoragePath;
-
-    public function __construct(GoogleDriveService $googleDriveService, string $localStorageFolder, string $driveStoragePath)
-    {
-        $this->googleDriveService = $googleDriveService;
-        $this->localStorageFolder = $localStorageFolder;
-        $this->driveStoragePath = $driveStoragePath;
+    public function __construct(
+        private readonly GoogleDriveService $googleDriveService,
+        private readonly EmailService $emailService,
+        private readonly string $localStorageFolder,
+        private readonly string $driveStoragePath,
+    ) {
         parent::__construct();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-
         $io->title('Starting storage backup process...');
 
         // Create archive
@@ -47,7 +45,7 @@ class BackupStorageCommand extends Command
         $io->info("Google Drive folder ID: {$folderId}");
 
         $io->info("Uploading backup to Google Drive...");
-        $this->googleDriveService->uploadFile($backupFilePath, $folderId);
+        $fileUploaded = $this->googleDriveService->uploadFile($backupFilePath, $folderId);
         $io->info("Uploaded backup to Google Drive.");
 
         // Clean up local archive
@@ -71,6 +69,11 @@ class BackupStorageCommand extends Command
                 $io->info("Deleted old backup: {$file->getName()}");
             }
         }
+
+        $this->emailService->send(
+            'Storage backup successful',
+            "Backup of {$this->localStorageFolder} was successful. File link: {$fileUploaded->getWebViewLink()}"
+        );
 
         $io->success('Backup process completed successfully.');
 

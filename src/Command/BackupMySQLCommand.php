@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Service\DatabaseBackupService;
 use App\Service\EmailService;
 use App\Service\GoogleDriveService;
 use Psr\Log\LoggerInterface;
@@ -11,36 +12,35 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
-    name: 'app:backup-storage',
-    description: 'Creates a backup of the storage folder and uploads it to Google Drive.',
+    name: 'app:backup-mysql',
+    description: 'Creates a backup of the MySQL database and uploads it to Google Drive.',
 )]
-class BackupStorageCommand extends Command
+class BackupMySQLCommand extends Command
 {
     public function __construct(
         private readonly GoogleDriveService $googleDriveService,
         private readonly EmailService $emailService,
+        private readonly DatabaseBackupService $databaseBackupService,
         private readonly LoggerInterface $logger,
-        private readonly string $localStorageFolder,
-        private readonly string $driveStoragePath,
+        private readonly string $driveMysqlPath,
     ) {
         parent::__construct();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->logger->info('Starting storage backup process...');
+        $this->logger->info('Starting MySQL backup process...');
 
         // Create archive
-        $backupFileName = 'storage_' . date('Y_m_d_H') . '.tar.gz';
+        $backupFileName = 'mysql_' . date('Y_m_d_H') . '.sql.gz';
         $backupFilePath = './data/' . $backupFileName;
-        $command = "tar -czvf {$backupFilePath} -C {$this->localStorageFolder} .";
-        shell_exec($command);
+        $this->databaseBackupService->backup($backupFilePath);
 
         $this->logger->info("Created backup archive: {$backupFileName}");
 
         // Upload to Google Drive
-        $this->logger->info("Ensuring Google Drive folder '{$this->driveStoragePath}' exists...");
-        $folderId = $this->googleDriveService->findOrCreatePath($this->driveStoragePath);
+        $this->logger->info("Ensuring Google Drive folder '{$this->driveMysqlPath}' exists...");
+        $folderId = $this->googleDriveService->findOrCreatePath($this->driveMysqlPath);
         $this->logger->info("Google Drive folder ID: {$folderId}");
 
         $this->logger->info("Uploading backup to Google Drive...");
@@ -70,8 +70,8 @@ class BackupStorageCommand extends Command
         }
 
         $this->emailService->send(
-            'Storage backup successful',
-            "Backup of {$this->localStorageFolder} was successful. File link: {$fileUploaded->getWebViewLink()}"
+            'MySQL backup successful',
+            "Backup of blog database was successful. File link: {$fileUploaded->getWebViewLink()}"
         );
 
         $this->logger->info('Backup process completed successfully.');

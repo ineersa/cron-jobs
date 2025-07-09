@@ -28,6 +28,7 @@ services:
 
     App\Command\BackupStorageCommand:
         arguments:
+            $logger: '@monolog.logger'
             $localStorageFolder: "%env(LOCAL_STORAGE_FOLDER)%"
             $driveStoragePath: "%env(DRIVE_STORAGE_PATH)%"
 
@@ -35,4 +36,13 @@ services:
         arguments:
             $from: '%env(MAILER_FROM)%'
             $to: '%env(MAILER_TO)%'
+
+    App\Service\DatabaseBackupService:
+        arguments:
+            $blogDatabaseUrl: '%env(BLOG_DATABASE_URL)%'
+
+    App\Command\BackupMySQLCommand:
+        arguments:
+            $logger: '@monolog.logger'
+            $driveMysqlPath: '%env(DRIVE_MYSQL_PATH)%'
 

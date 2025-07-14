@@ -18,19 +18,17 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
-
-    App\Service\GoogleDriveService:
+    App\Service\GoogleCloudStorageService:
         arguments:
-            $serviceAccountJsonPath: '%env(GOOGLE_SERVICE_ACCOUNT_JSON_PATH)%'
+            $serviceAccountJsonPath: '%env(resolve:GOOGLE_SERVICE_ACCOUNT_JSON_PATH)%'
+            $bucketName: '%env(GCS_BUCKET_NAME)%'
             $logger: '@monolog.logger'
-            $sharedEmail: '%env(GOOGLE_SHARED_EMAIL)%'
-
 
     App\Command\BackupStorageCommand:
         arguments:
             $logger: '@monolog.logger'
             $localStorageFolder: "%env(LOCAL_STORAGE_FOLDER)%"
-            $driveStoragePath: "%env(DRIVE_STORAGE_PATH)%"
+            $gcsPrefixPath: "%env(GCS_STORAGE_PREFIX_PATH)%"
 
     App\Service\EmailService:
         arguments:
@@ -44,5 +42,5 @@ services:
     App\Command\BackupMySQLCommand:
         arguments:
             $logger: '@monolog.logger'
-            $driveMysqlPath: '%env(DRIVE_MYSQL_PATH)%'
+            $gcsPrefixPath: "%env(GCS_MYSQL_PREFIX_PATH)%"
 
